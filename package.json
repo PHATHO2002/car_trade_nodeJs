@@ -1,0 +1,27 @@
+{
+  "name": "learning_socket_io",
+  "version": "1.0.0",
+  "description": "learning socket io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --inspect sever.js"
+  },
+  "author": "phatho",
+  "license": "ISC",
+  "dependencies": {
+    "connect-redis": "^7.1.1",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "jquery": "^3.7.1",
+    "mongoose": "^8.6.1",
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.3",
+    "redis": "^4.7.0",
+    "router": "^1.3.8",
+    "socket.io": "^4.7.5"
+  }
+}
