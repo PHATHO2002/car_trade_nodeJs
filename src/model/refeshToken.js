@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const refreshToken = new Schema({
 
-    refreshtoken: { type: String },
+    refreshToken: { type: String },
     createdAt: { type: Date, default: Date.now },
     updateAt: { type: Date, default: Date.now },
 

@@ -3,6 +3,7 @@ const http = require("http"); // Để tạo HTTP server
 const { Server } = require("socket.io"); // Import class Server từ socket.io
 const app = express();
 const router = require('./src/route/index.js');
+const cors = require('cors');
 const Db = require('./src/config/dbConfig.js')
 
 const path = require('path');
@@ -20,7 +21,7 @@ require('dotenv').config();
     app.use('/', express.static(path.join('./src', 'public')));
     app.set('view engine', 'ejs');
     app.set('views', path.join('./src', 'views'));
-
+    app.use(cors());
     // config req.body
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
@@ -30,7 +31,7 @@ require('dotenv').config();
 
 
 
-    const port = process.env.PORT || 3000;
+    const port = process.env.PORT || 4000;
     server.listen(port, () => {
         console.log(`app listening on ${port}`);
     });
