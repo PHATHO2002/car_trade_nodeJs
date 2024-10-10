@@ -12,9 +12,15 @@ class SiteController {
         try {
             let refreshTokens = await refreshTokenDb.find({});
             let refreshTokenArray = refreshTokens.map(token => token.refreshToken);
-
+            if (!req.body.refreshToken) {
+                return res.status(400).json({
+                    errCode: 1,
+                    message: 'Data is null',
+                    data: null,
+                });
+            }
             const refreshToken = req.body.refreshToken;
-            console.log(refreshToken)
+
             if (!refreshTokenArray.includes(refreshToken)) {
                 return res.sendStatus(403);
             }
