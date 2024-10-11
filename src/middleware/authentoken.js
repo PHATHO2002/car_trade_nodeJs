@@ -9,7 +9,7 @@ function authenToken(req, res, next) {
     //'Beaer [tonken]'
     const token = authorizationHeader.split(' ')[1];
 
-    jwt.verify(token, process.env.ACSSES_TOKEN_SECRET, (err, data) => {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, data) => {
 
         if (err) {
             return res.status(401).send(err);

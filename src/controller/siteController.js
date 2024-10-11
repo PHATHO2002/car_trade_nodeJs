@@ -1,7 +1,7 @@
 
 const jwt = require('jsonwebtoken');
 const refreshTokenDb = require('../model/refeshToken');
-
+const SiteService = require("../service/siteService")
 require('dotenv').config();
 
 
@@ -34,7 +34,7 @@ class SiteController {
                     role: data.role,
                     name: data.name,
                     avatar: data.avatarCloud
-                }, process.env.ACSSES_TOKEN_SECRET, { expiresIn: '60s' });
+                }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '60s' });
                 return res.status(200).json(accessToken);
 
             })
@@ -44,7 +44,55 @@ class SiteController {
         }
     }
 
+    login = async (req, res) => {
+        try {
 
+            const response = await SiteService.login(req.body);
+            if (response.data) {
+                let playLoad = {
+                    _id: response.data._id,
+                    role: response.data.role,
+                    userName: response.data.userName,
+                    avatar: response.data.avatarCloud
+
+                };
+
+                const accessToken = jwt.sign(playLoad, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '60s' });
+                const refreshToken = jwt.sign(playLoad, process.env.REFRESH_TOKEN_SECRET);
+                await refreshTokenDb.create({
+                    refreshToken: refreshToken,
+
+                })
+
+                response.data = { accessToken, refreshToken };
+                return res.status(200).json(response);
+            }
+            return res.status(400).json(response);
+        } catch (error) {
+            console.error(error);  // Sử dụng console.error để in rõ ràng lỗi
+            res.status(500).json({ error: error.message });
+        }
+    }
+    logout = async (req, res) => {
+        try {
+            const response = await SiteService.logout(req.body);
+            switch (response.errCode) {
+                case 1:
+                    return res.status(404).json(response);
+                    break;
+                case 2:
+                    return res.status(404).json(response);
+                    break;
+
+                default:
+                    return res.status(200).json(response);
+                    break;
+            }
+        } catch (error) {
+            console.error(error);  // Sử dụng console.error để in rõ ràng lỗi
+            res.status(500).json({ error: error.message });
+        }
+    }
 
 }
 module.exports = new SiteController();

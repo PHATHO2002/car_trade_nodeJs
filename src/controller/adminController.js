@@ -1,28 +1,26 @@
-const userService = require('../service/userService');
+const adminService = require('../service/adminService');
+const jwt = require('jsonwebtoken');
 
 require('dotenv').config();
 
-class UserController {
+class AdminController {
 
-    createNewUser = async (req, res) => {
+
+    addProduct = async (req, res) => {
         try {
             if (req.file) {
-                req.body.avatarCloud = req.file.path;
+                req.body.image = req.file.path;
             }
-            let response = await userService.createNewUser(req.body);
+            const response = await adminService.addProduct(req.body);
             switch (response.errCode) {
                 case 1:
                     return res.status(400).json(response);
-                    break;
-                case 2:
-                    return res.status(409).json(response);
                     break;
 
                 default:
                     return res.status(200).json(response);
                     break;
             }
-
         } catch (error) {
             console.error(error);  // Sử dụng console.error để in rõ ràng lỗi
             res.status(500).json({ error: error.message });
@@ -30,6 +28,5 @@ class UserController {
     }
 
 
-
 }
-module.exports = new UserController();
+module.exports = new AdminController();

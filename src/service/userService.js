@@ -1,31 +1,17 @@
+
 const userSchema = require("../model/User")
-const BaseService = require('./baseService')
 
-class UserService extends BaseService {
-    getAllUser = async () => {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const users = await userSchema.find({})
-                resolve({
-                    errCode: 0,
-                    message: 'get users succes',
-                    data: users,
-                });
-            } catch (error) {
-                reject(error);
-            }
-        })
+class UserService {
 
-    }
     createNewUser = (data) => {
         return new Promise(async (resolve, reject) => {
 
             try {
                 const { userName, password, avatarCloud } = data;
-                if (!userName || !password) {
+                if (!userName || typeof userName !== 'string' || userName.trim() === '' || !password || typeof password !== 'string' || password.trim() === '') {
                     return resolve({
                         errCode: 1,
-                        message: 'Username or password is null!',
+                        message: 'Invalid username and password!',
                         data: null,
                     });
                 }

@@ -1,6 +1,6 @@
-const UserMd = require("../model/User");
+const userSchema = require("../model/User");
 const refreshTokenDb = require('../model/refeshToken');
-class BaseService {
+class SiteService {
 
     login = (data) => {
         return new Promise(async (resolve, reject) => {
@@ -8,9 +8,9 @@ class BaseService {
 
                 const { userName, password } = data;
 
-                if (userName && password) {
+                if (userName && typeof userName == 'string' && userName.trim() !== '' && password && typeof password == 'string' && password.trim() !== '') {
 
-                    const user = await UserMd.findOne({ userName });
+                    const user = await userSchema.findOne({ userName });
 
                     if (!user) {
                         return resolve({
@@ -39,7 +39,7 @@ class BaseService {
                 } else {
                     return resolve({
                         errCode: 1,
-                        message: 'userName or password dont exits',
+                        message: 'Invalid username and password',
                         data: null,
                     });
                 }
@@ -55,7 +55,7 @@ class BaseService {
         return new Promise(async (resolve, reject) => {
             try {
 
-                if (data.refreshToken) {
+                if (data.refreshToken && typeof data.refreshToken == 'string' && data.refreshToken.trim() !== '') {
                     const reslut = await refreshTokenDb.findOneAndDelete({ refreshToken: data.refreshToken })
                     if (!reslut) {
                         return resolve({
@@ -88,4 +88,4 @@ class BaseService {
 
 }
 
-module.exports = BaseService;
+module.exports = new SiteService();
