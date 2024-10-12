@@ -1,3 +1,4 @@
+const productSchema = require("../model/product");
 class AdminService {
 
     addProduct = (data) => {
