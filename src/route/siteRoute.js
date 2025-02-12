@@ -1,16 +1,9 @@
 const express = require('express');
-const router = express.Router();
-
-
 const authenToken = require('../middleware/authentoken');
-
+const router = express.Router();
 const SiteController = require('../controller/siteController');
-
-
-router.post('/refreshToken', SiteController.refreshtoken)
 router.post('/login', SiteController.login);
-router.delete('/logout', authenToken, SiteController.logout);
-
-
+router.post('/logout', SiteController.logout);
+router.post('/refreshToken', SiteController.refreshtoken);
 
 module.exports = router;

@@ -1,18 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const authenToken = require('../middleware/authentoken');
-
-const uploadCloud = require('../middleware/uploader');
-
-
 const UserController = require('../controller/userController');
+const authenToken = require('../middleware/authentoken');
+const uploader = require('../middleware/uploader');
 
+// const uploadCloud = require('../middleware/uploader');
 
-router.post('/register', uploadCloud.single('avatar'), UserController.createNewUser);
+// const UserController = require('../controller/userController');
 
-
-
-
-
-
+router.post('/register', UserController.createNewUser);
+router.post('/post', authenToken, uploader, UserController.postTradeCar);
 module.exports = router;

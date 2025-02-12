@@ -1,91 +1,69 @@
-const userSchema = require("../model/User");
-const refreshTokenDb = require('../model/refeshToken');
-class SiteService {
-
+const BaseService = require('./baseService');
+const userSchema = require('../models/user');
+const jwt = require('jsonwebtoken');
+const refreshTokenSchema = require('../models/refreshToken');
+class SiteService extends BaseService {
+    constructor() {
+        super();
+    }
     login = (data) => {
         return new Promise(async (resolve, reject) => {
             try {
-
-                const { userName, password } = data;
-
-                if (userName && typeof userName == 'string' && userName.trim() !== '' && password && typeof password == 'string' && password.trim() !== '') {
-
-                    const user = await userSchema.findOne({ userName });
-
-                    if (!user) {
-                        return resolve({
-                            errCode: 2,
-                            message: 'tài khoản đéo đúng',
-                            data: null,
-                        });
-
-                    }
-                    const isMatch = await user.comparePassword(password);
-                    if (!isMatch) {
-                        return resolve({
-                            errCode: 2,
-                            message: 'mật khẩu sai',
-                            data: null,
-                        });
-                    }
-                    const { _id, avatarCloud, role } = user;
-
-                    resolve({
-                        errCode: 0,
-                        message: 'login successfuly',
-                        data: { _id, userName, role, avatarCloud },
-                    });
-
-                } else {
-                    return resolve({
-                        errCode: 1,
-                        message: 'Invalid username and password',
-                        data: null,
-                    });
+                const { username, password } = data;
+                if (
+                    !username ||
+                    typeof username !== 'string' ||
+                    username.trim() === '' ||
+                    !password ||
+                    typeof password !== 'string' ||
+                    password.trim() === ''
+                ) {
+                    return resolve(this.errorResponse(400, 'tài khoản mật khẩu không được để trống'));
                 }
 
+                const user = await userSchema.findOne({ username });
 
+                if (!user) {
+                    return resolve(this.errorResponse(400, 'Tài khoản  không đúng!'));
+                }
+                const isMatch = await user.comparePassword(password);
+                if (!isMatch) {
+                    return resolve(this.errorResponse(400, ' mật khẩu không đúng!'));
+                }
+                const { role } = user;
 
+                let payLoad = {
+                    role: role,
+                    username: username,
+                    userId: user._id,
+                };
+
+                const accessToken = jwt.sign(payLoad, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5m' });
+                const refreshToken = jwt.sign(payLoad, process.env.REFRESH_TOKEN_SECRET);
+                const userId = user._id;
+                await refreshTokenSchema.findOneAndUpdate(
+                    { userId: userId }, // Tìm user đã có refreshToken
+                    { refreshToken: refreshToken }, // Cập nhật token mới
+                    { upsert: true, new: true }, // Nếu chưa có thì tạo mới
+                );
+
+                return resolve(this.successResponse('login successFully ', { accessToken, refreshToken }));
             } catch (error) {
                 reject(error);
             }
         });
-    }
-    logout = (data) => {
+    };
+    logout = (refreshToken) => {
         return new Promise(async (resolve, reject) => {
             try {
-
-                if (data.refreshToken && typeof data.refreshToken == 'string' && data.refreshToken.trim() !== '') {
-                    const reslut = await refreshTokenDb.findOneAndDelete({ refreshToken: data.refreshToken })
-                    if (!reslut) {
-                        return resolve({
-                            errCode: 2,
-                            message: 'refreshToken not found in db',
-                            data: null,
-                        });
-                    }
-                    resolve({
-                        errCode: 0,
-                        message: 'logout successfully',
-                        data: null,
-                    });
-
-                } else {
-                    return resolve({
-                        errCode: 1,
-                        message: 'refreshToken exits',
-                        data: null,
-                    });
-                }
-
-
-
+                if (!refreshToken) return resolve(this.errorResponse(400, 'Không có Refresh Token'));
+                await refreshTokenSchema.deleteOne({ refreshToken: refreshToken });
+                return resolve(this.successResponse('logout successFully '));
             } catch (error) {
                 reject(error);
             }
-        })
-    }
-
+        });
+    };
 }
 
 module.exports = new SiteService();

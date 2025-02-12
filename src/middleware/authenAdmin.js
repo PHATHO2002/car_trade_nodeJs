@@ -16,7 +16,7 @@ function authenAdmin(req, res, next) {
         }
 
         // Kiểm tra xem người dùng có vai trò admin không
-        if (data.role !== 2) {
+        if (data.role !=='admin' ) {
             return res.status(403).send('Bạn không có quyền truy cập'); // Không có quyền
         }
 

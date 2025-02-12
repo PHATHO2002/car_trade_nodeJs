@@ -1,8 +1,8 @@
-var socket = io("http://localhost:3000/");
+var socket = io('http://localhost:3000/');
 
-socket.on("Sever-send-data", function (data) {
-    $("#noidung").append(data);
-})
+socket.on('Sever-send-data', function (data) {
+    $('#noidung').append(data);
+});
 $(document).ready(function () {
     // $("#mrA").click(
     //     function () {
@@ -10,5 +10,4 @@ $(document).ready(function () {
     //     }
     // );
     alert(1);
-
-})
+});

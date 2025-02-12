@@ -1,98 +1,59 @@
-
-const jwt = require('jsonwebtoken');
-const refreshTokenDb = require('../model/refeshToken');
-const SiteService = require("../service/siteService")
+const SiteService = require('../service/siteService');
 require('dotenv').config();
-
-
-
+const refreshTokenSchema = require('../models/refreshToken');
+const jwt = require('jsonwebtoken');
 class SiteController {
-
     refreshtoken = async (req, res) => {
         try {
-            let refreshTokens = await refreshTokenDb.find({});
-            let refreshTokenArray = refreshTokens.map(token => token.refreshToken);
-            if (!req.body.refreshToken) {
-                return res.status(400).json({
-                    errCode: 1,
-                    message: 'Data is null',
-                    data: null,
-                });
-            }
-            const refreshToken = req.body.refreshToken;
+            const refreshToken = req.cookies.refreshToken;
+            const isExitRefreshToken = await refreshTokenSchema.findOne({ refreshToken: refreshToken });
+            if (!refreshToken) return res.status(403).json({ message: 'Không có refresh token' });
+            if (!isExitRefreshToken) return res.status(403).json({ message: 'Refresh token không hợp lệ' });
 
-            if (!refreshTokenArray.includes(refreshToken)) {
-                return res.sendStatus(403);
-            }
-            jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
-
-                if (err) {
-                    return res.status(401).send(err);
-                }
-                const accessToken = jwt.sign({
-                    _id: data._id,
-                    role: data.role,
-                    name: data.name,
-                    avatar: data.avatarCloud
-                }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '60s' });
-                return res.status(200).json(accessToken);
-
-            })
+            jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+                if (err) return res.status(403).json({ message: 'Refresh token hết hạn' });
+                const payLoad = { userId: user.userId, username:user.username,role: user.role, iat: Math.floor(Date.now() / 1000) };
+                const newAccessToken = jwt.sign(payLoad, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+                res.status(200).json({ accessToken: newAccessToken });
+            });
         } catch (error) {
-            console.error(error);  // Sử dụng console.error để in rõ ràng lỗi
+            console.error(error); // Sử dụng console.error để in rõ ràng lỗi
             res.status(500).json({ error: error.message });
         }
-    }
+    };
 
     login = async (req, res) => {
         try {
-
             const response = await SiteService.login(req.body);
             if (response.data) {
-                let playLoad = {
-                    _id: response.data._id,
-                    role: response.data.role,
-                    userName: response.data.userName,
-                    avatar: response.data.avatarCloud
-
-                };
-
-                const accessToken = jwt.sign(playLoad, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '60s' });
-                const refreshToken = jwt.sign(playLoad, process.env.REFRESH_TOKEN_SECRET);
-                await refreshTokenDb.create({
-                    refreshToken: refreshToken,
-
-                })
-
-                response.data = { accessToken, refreshToken };
-                return res.status(200).json(response);
+                res.cookie('refreshToken', response.data.refreshToken, {
+                    httpOnly: true, // Ngăn JavaScript truy cập cookie → Chống XSS
+                    secure: true, // Chỉ gửi cookie qua HTTPS → Bảo mật hơn
+                    sameSite: 'Strict', // Chặn gửi cookie từ trang khác → Chống CSRF
+                });
+                let { accessToken, refreshToken } = response.data;
+                response.data = { accessToken };
             }
-            return res.status(400).json(response);
+
+            res.status(response.status).json(response);
         } catch (error) {
-            console.error(error);  // Sử dụng console.error để in rõ ràng lỗi
-            res.status(500).json({ error: error.message });
+            console.error(error); // Sử dụng console.error để in rõ ràng lỗi
+            res.status(500).json({ message: 'server error' });
         }
-    }
+    };
     logout = async (req, res) => {
         try {
-            const response = await SiteService.logout(req.body);
-            switch (response.errCode) {
-                case 1:
-                    return res.status(404).json(response);
-                    break;
-                case 2:
-                    return res.status(404).json(response);
-                    break;
-
-                default:
-                    return res.status(200).json(response);
-                    break;
-            }
+            const response = await SiteService.logout(req.cookies.refreshToken);
+            res.clearCookie('refreshToken', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'Strict',
+            });
+            res.status(response.status).json(response);
         } catch (error) {
-            console.error(error);  // Sử dụng console.error để in rõ ràng lỗi
-            res.status(500).json({ error: error.message });
+            console.error(error); // Sử dụng console.error để in rõ ràng lỗi
+            res.status(500).json({ message: 'server error' });
         }
-    }
-
+    };
 }
 module.exports = new SiteController();
