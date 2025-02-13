@@ -11,6 +11,26 @@ class AdminService extends BaseService {
             }
         });
     };
+    decisionPendingCar = (data) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if (!data.status || !(data.status == 'accepted' || data.status == 'rejected')) {
+                    return resolve(this.errorResponse(400, 'status không đúng'));
+                }
+                if (this.validateId(data.id)) {
+                    return resolve(this.errorResponse(400, this.validateId(data.id)));
+                }
+                const pendingCar = await pendingCarSchema.findByIdAndUpdate(
+                    data.id,
+                    { status: data.status },
+                    { new: true },
+                );
+                return resolve(this.successResponse(' decision pending car success ', pendingCar));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
 }
 
 module.exports = new AdminService();

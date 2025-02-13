@@ -1,23 +1,17 @@
 const express = require('express');
 const http = require('http'); // Để tạo HTTP server
-// const { Server } = require("socket.io"); // Import class Server từ socket.io
 const app = express();
 const cookieParser = require('cookie-parser');
 const router = require('./src/route/index.js');
 const cors = require('cors');
 const Db = require('./src/config/dbConfig.js');
-
+const { setupSocket } = require('./src/config/socket.js');
 const path = require('path');
 require('dotenv').config();
-
-// app.use(morgan('combined'));
 
 (async () => {
     // Tạo HTTP server
     const server = http.createServer(app);
-
-    // Tạo instance của socket.io với server vừa tạo
-    // const io = new Server(server);
 
     app.use('/', express.static(path.join('./src', 'public')));
     app.set('view engine', 'ejs');
@@ -32,10 +26,10 @@ require('dotenv').config();
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
     Db.connect(app);
-
     router(app);
 
     const port = process.env.PORT || 4000;
+    setupSocket(server);
     server.listen(port, () => {
         console.log(`app listening on ${port}`);
     });

@@ -57,7 +57,7 @@ class UserService extends BaseService {
                     status: 'pending',
                 });
                 await newPendingCar.save();
-                return resolve(this.successResponse('đăng tin bán xe thành công!'));
+                return resolve(this.successResponse('đăng tin bán xe thành công!', newPendingCar));
             } catch (error) {
                 reject(error);
             }

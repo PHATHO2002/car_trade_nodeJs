@@ -14,6 +14,12 @@ class BaseService {
             data,
         };
     }
+    validateId = (id) => {
+        if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+            return 'id không hợp lệ.';
+        }
+        return false;
+    };
     validateCarData = (data) => {
         if (!data.title || typeof data.title !== 'string' || data.title.trim().length < 5) {
             return 'Tiêu đề phải là chuỗi có ít nhất 5 ký tự.';
