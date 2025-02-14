@@ -10,4 +10,8 @@ const uploader = require('../middleware/uploader');
 
 router.post('/register', UserController.createNewUser);
 router.post('/post', authenToken, uploader, UserController.postTradeCar);
+router.post('/get-selling-car', authenToken, UserController.getApprovaledCar);
+router.post('/get-cart', authenToken, UserController.getCart);
+router.post('/add-to-cart', authenToken, UserController.addToCart);
+router.post('/delete-item-in-cart', authenToken, UserController.deleteItemInCart);
 module.exports = router;

@@ -38,10 +38,6 @@ class BaseService {
             return 'Địa chỉ không được để trống.';
         }
 
-        if (!data.sellerId || !data.sellerId.match(/^[0-9a-fA-F]{24}$/)) {
-            return 'sellerId không hợp lệ.';
-        }
-
         return false;
     };
 }

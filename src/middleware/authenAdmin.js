@@ -3,24 +3,24 @@ const jwt = require('jsonwebtoken');
 
 function authenAdmin(req, res, next) {
     const authorizationHeader = req.headers['authorization'];
+
     if (!authorizationHeader) {
-        return res.sendStatus(401); // Không có token
+        return res.status(401).json({ message: 'Không có token, vui lòng đăng nhập' });
     }
-    // 'Bearer [token]'
-    const token = authorizationHeader.split(' ')[1];
 
-    // Giải mã token để lấy thông tin payload
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, data) => {
+    const token = authorizationHeader.split(' ')[1]; // Lấy token từ header
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
         if (err) {
-            return res.status(401).send('Token không hợp lệ'); // Token không hợp lệ
+            if (err.name === 'TokenExpiredError') {
+                return res.status(401).json({ message: 'jwt expired' });
+            }
+            return res.status(403).json({ message: 'Token không hợp lệ' });
         }
-
-        // Kiểm tra xem người dùng có vai trò admin không
-        if (data.role !=='admin' ) {
+        if (decoded.role !== 'admin') {
             return res.status(403).send('Bạn không có quyền truy cập'); // Không có quyền
         }
-
-        // Nếu tất cả đều đúng, tiếp tục
+        req.userId = decoded.userId; // Gán thông tin user vào request
         next();
     });
 }
