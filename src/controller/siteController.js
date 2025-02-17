@@ -1,5 +1,6 @@
 const SiteService = require('../service/siteService');
 require('dotenv').config();
+
 const refreshTokenSchema = require('../models/refreshToken');
 const jwt = require('jsonwebtoken');
 class SiteController {
@@ -31,10 +32,12 @@ class SiteController {
         try {
             const response = await SiteService.login(req.body);
             if (response.data) {
+                const oneMonth = 30 * 24 * 60 * 60 * 1000;
                 res.cookie('refreshToken', response.data.refreshToken, {
                     httpOnly: true, // Ngăn JavaScript truy cập cookie → Chống XSS
                     secure: true, // Chỉ gửi cookie qua HTTPS → Bảo mật hơn
                     sameSite: 'Strict', // Chặn gửi cookie từ trang khác → Chống CSRF
+                    expires: new Date(Date.now() + oneMonth),
                 });
                 let { accessToken, refreshToken } = response.data;
                 response.data = { accessToken };

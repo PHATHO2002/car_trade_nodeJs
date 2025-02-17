@@ -50,7 +50,7 @@ class UserController {
     };
     deleteItemInCart = async (req, res) => {
         try {
-            const response = await userService.deleteItemInCart(req.body);
+            const response = await userService.deleteItemInCart(req.userId, req.body);
             res.status(response.status).json(response);
         } catch (error) {
             console.error(error);

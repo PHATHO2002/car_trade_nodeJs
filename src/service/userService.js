@@ -2,6 +2,7 @@ const BaseService = require('./baseService');
 const userSchema = require('../models/user');
 const pendingCarSchema = require('../models/pendingCar');
 const cartSchema = require('../models/Cart');
+const { ObjectId } = require('mongodb');
 class UserService extends BaseService {
     constructor() {
         super();
@@ -95,22 +96,21 @@ class UserService extends BaseService {
             }
         });
     };
-    deleteItemInCart = (data) => {
+    deleteItemInCart = (userId, data) => {
         return new Promise(async (resolve, reject) => {
             try {
-                if (this.validateId(data.cartId)) {
+                if (this.validateId(userId)) {
                     return resolve(this.errorResponse(400, 'userId không hợp lệ'));
                 }
-                if (this.validateId(data.cartId)) {
-                    return resolve(this.errorResponse(400, 'cartId không hợp lệ'));
+                if (this.validateId(data.carId)) {
+                    return resolve(this.errorResponse(400, 'carId không hợp lệ'));
                 }
-                const items = cartSchema.findOne({ _id: data.cartId }).select('carIds');
-                // await cartSchema.findOneAndUpdate(
-                //     { userId: userId }, // Điều kiện tìm
-                //     { $push: { carIds: data.carId } }, // Dữ liệu cần cập nhật
-                //     { new: true, runValidators: true }, // Tùy chọn
-                // );
-                return resolve(this.successResponse('delete item in cart success ', items));
+
+                const result = await cartSchema.updateOne(
+                    { userId: userId },
+                    { $pull: { carIds: new ObjectId(data.carId) } },
+                );
+                return resolve(this.successResponse('delete item in cart success ', result));
             } catch (error) {
                 reject(error);
             }
