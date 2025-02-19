@@ -5,6 +5,7 @@ const pendingCarSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     description: { type: String, required: true },
     address: { type: String, required: true },
+    sellerName: { type: String, required: true },
     sellerId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
     images: { type: [String], required: true },
     status: { type: String, enum: ['pending', 'rejected'], default: 'pending' }, // Trạng thái duyệt

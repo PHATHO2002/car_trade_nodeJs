@@ -1,6 +1,7 @@
 const { Server } = require('socket.io');
 const socketAuth = require('../middleware/socketAuth');
 const postPendingCarSocket = require('../sockets/handlerPostSocket');
+const sendMessToSocket = require('../sockets/handleSendMess');
 const usersOnline = [];
 const setupSocket = (server) => {
     const io = new Server(server, {
@@ -24,10 +25,11 @@ const setupSocket = (server) => {
             io.emit('users_online', usersOnline); // Gửi danh sách người dùng online đến tất cả client
         });
         postPendingCarSocket(io, socket);
+        sendMessToSocket(io, socket, usersOnline);
         socket.on('disconnect', () => {
             const userIndex = usersOnline.findIndex((user) => user.socketId === socket.id);
             usersOnline.splice(userIndex, 1);
-            io.emit('user_disconnected', usersOnline);
+            io.emit('users_online', usersOnline);
             console.log(`❌ Client disconnected: ${socket.id}`);
         });
     });

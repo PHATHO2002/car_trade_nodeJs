@@ -2,6 +2,7 @@ const BaseService = require('./baseService');
 const userSchema = require('../models/user');
 const pendingCarSchema = require('../models/pendingCar');
 const cartSchema = require('../models/Cart');
+const chatSchema = require('../models/chat');
 const { ObjectId } = require('mongodb');
 class UserService extends BaseService {
     constructor() {
@@ -10,7 +11,7 @@ class UserService extends BaseService {
     createNewUser = (data) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const { username, password } = data;
+                const { username, password } = data || {};
                 if (
                     !username ||
                     typeof username !== 'string' ||
@@ -40,7 +41,7 @@ class UserService extends BaseService {
             }
         });
     };
-    postTradeCar = (userId, files, data) => {
+    postTradeCar = (userId, files, username, data) => {
         return new Promise(async (resolve, reject) => {
             try {
                 const err = this.validateCarData(data);
@@ -55,6 +56,7 @@ class UserService extends BaseService {
                     price: data.price,
                     description: data.description,
                     address: data.address,
+                    sellerName: username,
                     sellerId: userId,
                     images: imageUrls, // Lưu danh sách URL ảnh từ Cloudinary
                     status: 'pending',
@@ -70,6 +72,7 @@ class UserService extends BaseService {
         return new Promise(async (resolve, reject) => {
             try {
                 const approvaledCars = await pendingCarSchema.find({ status: 'accepted' });
+                if (approvaledCars.length === 0) return resolve(this.errorResponse(400, 'empty approvaledCars'));
                 return resolve(this.successResponse('get Approval car success ', approvaledCars));
             } catch (error) {
                 reject(error);
@@ -110,7 +113,29 @@ class UserService extends BaseService {
                     { userId: userId },
                     { $pull: { carIds: new ObjectId(data.carId) } },
                 );
+                if (!result) return resolve(this.errorResponse(400, 'no exits userId'));
                 return resolve(this.successResponse('delete item in cart success ', result));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    chatTwo = (userId, data) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const { receiverId, message } = data || {};
+                if (this.validateId(userId)) {
+                    return resolve(this.errorResponse(400, 'senderId không hợp lệ'));
+                }
+                if (this.validateId(receiverId)) {
+                    return resolve(this.errorResponse(400, 'receiverId không hợp lệ'));
+                }
+                if (!message) {
+                    return resolve(this.errorResponse(400, 'empty mess'));
+                }
+                const newChat = new chatSchema({ senderId: userId, receiverId: receiverId, message: message });
+                await newChat.save();
+                return resolve(this.successResponse('send mess success ', newChat));
             } catch (error) {
                 reject(error);
             }
@@ -128,8 +153,31 @@ class UserService extends BaseService {
                     )
                     .populate('carIds')
                     .exec();
-
+                if (!carts) return resolve(this.errorResponse(400, 'empty carts'));
                 return resolve(this.successResponse('get carts car success ', carts));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    getMessage = (userId, data) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const { receiverId } = data || {};
+                if (this.validateId(userId)) {
+                    return resolve(this.errorResponse(400, 'senderId không hợp lệ'));
+                }
+                if (this.validateId(receiverId)) {
+                    return resolve(this.errorResponse(400, 'receiverId không hợp lệ'));
+                }
+                const messages = await chatSchema.find({
+                    $or: [
+                        { senderId: userId, receiverId: receiverId },
+                        { senderId: receiverId, receiverId: userId },
+                    ],
+                });
+                if (messages.length === 0) return resolve(this.errorResponse(400, 'empty messages'));
+                return resolve(this.successResponse('get messages successfuly ', messages));
             } catch (error) {
                 reject(error);
             }

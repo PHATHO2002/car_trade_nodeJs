@@ -14,7 +14,7 @@ class UserController {
     };
     postTradeCar = async (req, res) => {
         try {
-            const response = await userService.postTradeCar(req.userId, req.files, req.body);
+            const response = await userService.postTradeCar(req.userId, req.files, req.username, req.body);
             res.status(response.status).json(response);
         } catch (error) {
             console.error(error); // Sử dụng console.error để in rõ ràng lỗi
@@ -42,6 +42,24 @@ class UserController {
     addToCart = async (req, res) => {
         try {
             const response = await userService.addToCart(req.userId, req.body); //req.userId lấy trong middleware authentoken
+            res.status(response.status).json(response);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    };
+    chatTwo = async (req, res) => {
+        try {
+            const response = await userService.chatTwo(req.userId, req.body); //req.userId lấy trong middleware authentoken
+            res.status(response.status).json(response);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    };
+    getMessage = async (req, res) => {
+        try {
+            const response = await userService.getMessage(req.userId, req.body); //req.userId lấy trong middleware authentoken
             res.status(response.status).json(response);
         } catch (error) {
             console.error(error);

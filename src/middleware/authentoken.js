@@ -18,7 +18,8 @@ function authenToken(req, res, next) {
             return res.status(403).json({ message: 'Token không hợp lệ' });
         }
 
-        req.userId = decoded.userId; // Gán thông tin user vào request
+        req.userId = decoded.userId;
+        req.username = decoded.username; // Gán thông tin user vào request
         next();
     });
 }

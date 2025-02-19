@@ -9,7 +9,7 @@ class SiteService extends BaseService {
     login = (data) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const { username, password } = data;
+                const { username, password } = data || {};
                 if (
                     !username ||
                     typeof username !== 'string' ||
