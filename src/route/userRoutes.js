@@ -16,4 +16,6 @@ router.post('/add-to-cart', authenToken, UserController.addToCart);
 router.post('/chat-two', authenToken, UserController.chatTwo);
 router.post('/get-message', authenToken, UserController.getMessage);
 router.post('/delete-item-in-cart', authenToken, UserController.deleteItemInCart);
+// router.get('get-unread-mess',authenToken)
+router.get('/get-user-post', authenToken, UserController.getPost);
 module.exports = router;

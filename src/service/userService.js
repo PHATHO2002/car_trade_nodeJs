@@ -153,7 +153,6 @@ class UserService extends BaseService {
                     )
                     .populate('carIds')
                     .exec();
-                if (!carts) return resolve(this.errorResponse(400, 'empty carts'));
                 return resolve(this.successResponse('get carts car success ', carts));
             } catch (error) {
                 reject(error);
@@ -176,8 +175,18 @@ class UserService extends BaseService {
                         { senderId: receiverId, receiverId: userId },
                     ],
                 });
-                if (messages.length === 0) return resolve(this.errorResponse(400, 'empty messages'));
+
                 return resolve(this.successResponse('get messages successfuly ', messages));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    getPost = (userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const pendingCars = await pendingCarSchema.find({ sellerId: userId });
+                return resolve(this.successResponse('get post success ', pendingCars));
             } catch (error) {
                 reject(error);
             }

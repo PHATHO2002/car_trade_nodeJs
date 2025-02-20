@@ -16,6 +16,7 @@ const chatSchema = new mongoose.Schema(
             type: String, // Nội dung tin nhắn
             required: true,
         },
+        isRead: { type: Boolean, default: false },
         timestamp: {
             type: Date, // Thời gian gửi tin nhắn
             default: Date.now,
