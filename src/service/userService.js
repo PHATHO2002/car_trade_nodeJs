@@ -182,11 +182,77 @@ class UserService extends BaseService {
             }
         });
     };
+
     getPost = (userId) => {
         return new Promise(async (resolve, reject) => {
             try {
                 const pendingCars = await pendingCarSchema.find({ sellerId: userId });
                 return resolve(this.successResponse('get post success ', pendingCars));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    markReadedMess = async (userId, data) => {
+        return new Promise((resolve, reject) => {
+            try {
+                data.unReadedMess.forEach(async (id) => {
+                    await chatSchema.findOneAndUpdate(
+                        {
+                            $and: [
+                                { _id: id },
+                                {
+                                    receiverId: userId,
+                                },
+                            ],
+                        },
+                        { isRead: true },
+                        { new: true },
+                    );
+                });
+                return resolve(this.successResponse('update readed success '));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    getListChatPartner = (userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const messages = await chatSchema
+                    .find({
+                        $or: [{ senderId: userId }, { receiverId: userId }],
+                    })
+                    .sort({ createdAt: -1 });
+
+                const listPartner = [];
+
+                messages.forEach((mess) => {
+                    let { senderId, receiverId } = mess;
+                    senderId = senderId.toString();
+                    receiverId = receiverId.toString();
+                    let id;
+                    if (senderId === userId) {
+                        if (receiverId == userId) {
+                            id = senderId; // case chat yourseft
+                        } else {
+                            id = receiverId;
+                        }
+                    } else {
+                        id = senderId;
+                    }
+                    if (id)
+                        if (!listPartner.some((item) => item.id == id))
+                            listPartner.push({ id, mess: mess.message, isRead: mess.isRead });
+                });
+                let newlistPartner = await Promise.all(
+                    listPartner.map(async (item) => {
+                        let name = await userSchema.findOne({ _id: item.id }, { username: 1, _id: 0 });
+                        item.name = name.username;
+                        return item;
+                    }),
+                );
+                return resolve(this.successResponse('get list partner success ', newlistPartner));
             } catch (error) {
                 reject(error);
             }

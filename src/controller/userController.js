@@ -75,6 +75,25 @@ class UserController {
             res.status(500).json({ error: error.message });
         }
     };
+    markReadedMess = async (req, res) => {
+        try {
+            const response = await userService.markReadedMess(req.userId, req.body);
+            res.status(response.status).json(response);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    };
+    getListChatPartner = async (req, res) => {
+        try {
+            const response = await userService.getListChatPartner(req.userId);
+            res.status(response.status).json(response);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    };
+
     getPost = async (req, res) => {
         try {
             const response = await userService.getPost(req.userId);
