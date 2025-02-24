@@ -193,8 +193,8 @@ class UserService extends BaseService {
             }
         });
     };
-    markReadedMess = async (userId, data) => {
-        return new Promise((resolve, reject) => {
+    markReadedMess = (userId, data) => {
+        return new Promise(async (resolve, reject) => {
             try {
                 data.unReadedMess.forEach(async (id) => {
                     await chatSchema.findOneAndUpdate(
@@ -211,6 +211,21 @@ class UserService extends BaseService {
                     );
                 });
                 return resolve(this.successResponse('update readed success '));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    getUnReadMess = (userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const messages = await chatSchema
+                    .find({
+                        receiverId: userId,
+                        isRead: false,
+                    })
+                    .sort({ createdAt: -1 });
+                return resolve(this.successResponse('get list mess unread success ', messages));
             } catch (error) {
                 reject(error);
             }
@@ -243,7 +258,7 @@ class UserService extends BaseService {
                     }
                     if (id)
                         if (!listPartner.some((item) => item.id == id))
-                            listPartner.push({ id, mess: mess.message, isRead: mess.isRead });
+                            listPartner.push({ id, senderId: mess.senderId, mess: mess.message, isRead: mess.isRead });
                 });
                 let newlistPartner = await Promise.all(
                     listPartner.map(async (item) => {

@@ -93,7 +93,15 @@ class UserController {
             res.status(500).json({ error: error.message });
         }
     };
-
+    getUnReadMess = async (req, res) => {
+        try {
+            const response = await userService.getUnReadMess(req.userId);
+            res.status(response.status).json(response);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    };
     getPost = async (req, res) => {
         try {
             const response = await userService.getPost(req.userId);
