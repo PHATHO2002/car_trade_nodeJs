@@ -57,6 +57,15 @@ class UserController {
             res.status(500).json({ error: error.message });
         }
     };
+    deletePost = async (req, res) => {
+        try {
+            const response = await userService.deletePost(req.userId, req.body); //req.userId lấy trong middleware authentoken
+            res.status(response.status).json(response);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    };
     getMessage = async (req, res) => {
         try {
             const response = await userService.getMessage(req.userId, req.body); //req.userId lấy trong middleware authentoken
@@ -102,9 +111,28 @@ class UserController {
             res.status(500).json({ error: error.message });
         }
     };
-    getPost = async (req, res) => {
+    getPosts = async (req, res) => {
         try {
-            const response = await userService.getPost(req.userId);
+            const response = await userService.getPosts(req.userId);
+            res.status(response.status).json(response);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    };
+    search = async (req, res) => {
+        try {
+            const { slug } = req.params;
+            const response = await userService.search(slug);
+            res.status(response.status).json(response);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    };
+    getUserOwnPosts = async (req, res) => {
+        try {
+            const response = await userService.getUserOwnPosts(req.userId);
             res.status(response.status).json(response);
         } catch (error) {
             console.error(error);

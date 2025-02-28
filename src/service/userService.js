@@ -4,6 +4,7 @@ const pendingCarSchema = require('../models/pendingCar');
 const cartSchema = require('../models/Cart');
 const chatSchema = require('../models/chat');
 const { ObjectId } = require('mongodb');
+const { data } = require('jquery');
 class UserService extends BaseService {
     constructor() {
         super();
@@ -120,6 +121,26 @@ class UserService extends BaseService {
             }
         });
     };
+    deletePost = (userId, data) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if (this.validateId(data.carId)) {
+                    return resolve(this.errorResponse(400, 'carId không hợp lệ'));
+                }
+                const deletedPost = await pendingCarSchema.findOneAndDelete({
+                    sellerId: userId,
+                    _id: data.carId,
+                });
+                if (deletedPost) {
+                    return resolve(this.successResponse('Xóa bài đăng thành công', deletedPost));
+                } else {
+                    return resolve(this.errorResponse(404, 'Không tìm thấy bài đăng'));
+                }
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
     chatTwo = (userId, data) => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -141,6 +162,7 @@ class UserService extends BaseService {
             }
         });
     };
+
     getCart = (userId) => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -183,7 +205,7 @@ class UserService extends BaseService {
         });
     };
 
-    getPost = (userId) => {
+    getPosts = (userId) => {
         return new Promise(async (resolve, reject) => {
             try {
                 const pendingCars = await pendingCarSchema.find({ sellerId: userId });
@@ -268,6 +290,31 @@ class UserService extends BaseService {
                     }),
                 );
                 return resolve(this.successResponse('get list partner success ', newlistPartner));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    search = (query) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if (!query.trim()) return resolve(this.errorResponse(400, 'query empty'));
+                const response = await pendingCarSchema.find({
+                    $and: [{ title: { $regex: query, $options: 'i' } }, { status: 'accepted' }],
+                });
+                return resolve(this.successResponse('search success ', response));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    getUserOwnPosts = (userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const rp = await pendingCarSchema.find({
+                    sellerId: userId,
+                });
+                return resolve(this.successResponse('get User Own osts success ', rp));
             } catch (error) {
                 reject(error);
             }
