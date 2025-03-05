@@ -1,13 +1,16 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
+// const ObjectId = Schema.ObjectId;
 const bcrypt = require('bcryptjs');
 const userSchema = new Schema({
     username: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, required: true, default: '' },
     role: { type: String },
+    phone: { type: String, unique: true, default: '' }, // Không required
+    email: { type: String, unique: true, default: '' }, // Không required
+    address: { type: String, default: '' }, // Địa chỉ
     createdAt: { type: Date, default: Date.now },
-    updateAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
 });
 // Hàm mã hóa mật khẩu trước khi lưu vào database
 userSchema.pre('save', async function (next) {

@@ -14,9 +14,13 @@ router.post('/get-message', authenToken, UserController.getMessage);
 router.post('/delete-item-in-cart', authenToken, UserController.deleteItemInCart);
 router.post('/mark-readed-mess', authenToken, UserController.markReadedMess);
 router.post('/delete-post', authenToken, UserController.deletePost);
+// router.post('/updateUser',authenToken,UserController)
+
 router.get('/get-list-chat-partner', authenToken, UserController.getListChatPartner);
 router.get('/get-user-post', authenToken, UserController.getPosts);
 router.get('/get-unread-mess', authenToken, UserController.getUnReadMess);
 router.get('/get-user-own-posts', authenToken, UserController.getUserOwnPosts);
 router.get('/search/:slug', authenToken, UserController.search);
+router.get('/detail', authenToken, UserController.getDetailUser);
+
 module.exports = router;

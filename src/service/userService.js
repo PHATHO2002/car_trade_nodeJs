@@ -4,7 +4,7 @@ const pendingCarSchema = require('../models/pendingCar');
 const cartSchema = require('../models/Cart');
 const chatSchema = require('../models/chat');
 const { ObjectId } = require('mongodb');
-const { data } = require('jquery');
+
 class UserService extends BaseService {
     constructor() {
         super();
@@ -315,6 +315,16 @@ class UserService extends BaseService {
                     sellerId: userId,
                 });
                 return resolve(this.successResponse('get User Own osts success ', rp));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    getDetailUser = (userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const rp = await userSchema.findOne({ _id: userId }).select('-password');
+                return resolve(this.successResponse('get User detail success ', rp));
             } catch (error) {
                 reject(error);
             }
