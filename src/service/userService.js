@@ -141,6 +141,25 @@ class UserService extends BaseService {
             }
         });
     };
+
+    getCart = (userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if (this.validateId(userId)) {
+                    return resolve(this.errorResponse(400, this.validateId(userId)));
+                }
+                const carts = await cartSchema
+                    .findOne(
+                        { userId: userId }, // Tùy chọn
+                    )
+                    .populate('carIds')
+                    .exec();
+                return resolve(this.successResponse('get carts car success ', carts));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
     chatTwo = (userId, data) => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -161,26 +180,8 @@ class UserService extends BaseService {
                 reject(error);
             }
         });
-    };
+    }; // send mes beetween two people
 
-    getCart = (userId) => {
-        return new Promise(async (resolve, reject) => {
-            try {
-                if (this.validateId(userId)) {
-                    return resolve(this.errorResponse(400, this.validateId(userId)));
-                }
-                const carts = await cartSchema
-                    .findOne(
-                        { userId: userId }, // Tùy chọn
-                    )
-                    .populate('carIds')
-                    .exec();
-                return resolve(this.successResponse('get carts car success ', carts));
-            } catch (error) {
-                reject(error);
-            }
-        });
-    };
     getMessage = (userId, data) => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -233,6 +234,28 @@ class UserService extends BaseService {
                     );
                 });
                 return resolve(this.successResponse('update readed success '));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+
+    updateUser = (userId, data) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const updateData = {};
+                if (data.username) updateData.username = data.username;
+                if (data.phone) updateData.phone = data.phone;
+                if (data.email) updateData.email = data.email;
+                if (data.address) updateData.address = data.address;
+                const err = this.validateUserData(updateData);
+                if (err) return resolve(this.errorResponse(400, err));
+                const userUpdated = await userSchema.findOneAndUpdate(
+                    { _id: userId },
+                    { $set: updateData },
+                    { returnDocument: 'after' },
+                );
+                return resolve(this.successResponse('update exits user filed success ', userUpdated));
             } catch (error) {
                 reject(error);
             }

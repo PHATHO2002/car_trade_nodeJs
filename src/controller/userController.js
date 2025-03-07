@@ -93,6 +93,16 @@ class UserController {
             res.status(500).json({ error: error.message });
         }
     };
+    updateUser = async (req, res) => {
+        try {
+            const response = await userService.updateUser(req.userId, req.body);
+            res.status(response.status).json(response);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    };
+
     getListChatPartner = async (req, res) => {
         try {
             const response = await userService.getListChatPartner(req.userId);
