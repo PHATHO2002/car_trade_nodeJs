@@ -244,10 +244,30 @@ class UserService extends BaseService {
         return new Promise(async (resolve, reject) => {
             try {
                 const updateData = {};
-                if (data.username) updateData.username = data.username;
                 if (data.phone) updateData.phone = data.phone;
                 if (data.email) updateData.email = data.email;
-                if (data.address) updateData.address = data.address;
+                if (data.address) {
+                    updateData.address = {};
+
+                    if (data.address.province) {
+                        updateData.address.province = {
+                            code: data.address.province.code || '',
+                            name: data.address.province.name || '',
+                        };
+                    }
+                    if (data.address.district) {
+                        updateData.address.district = {
+                            code: data.address.district.code || '',
+                            name: data.address.district.name || '',
+                        };
+                    }
+                    if (data.address.ward) {
+                        updateData.address.ward = {
+                            code: data.address.ward.code || '',
+                            name: data.address.ward.name || '',
+                        };
+                    }
+                }
                 const err = this.validateUserData(updateData);
                 if (err) return resolve(this.errorResponse(400, err));
                 const userUpdated = await userSchema.findOneAndUpdate(
@@ -255,7 +275,7 @@ class UserService extends BaseService {
                     { $set: updateData },
                     { returnDocument: 'after' },
                 );
-                return resolve(this.successResponse('update exits user filed success ', userUpdated));
+                return resolve(this.successResponse('update exits user infor success ', userUpdated));
             } catch (error) {
                 reject(error);
             }
@@ -308,7 +328,11 @@ class UserService extends BaseService {
                 let newlistPartner = await Promise.all(
                     listPartner.map(async (item) => {
                         let name = await userSchema.findOne({ _id: item.id }, { username: 1, _id: 0 });
-                        item.name = name.username;
+                        if (name) {
+                            item.name = name.username;
+                        } else {
+                            item.name = 'unknow';
+                        }
                         return item;
                     }),
                 );

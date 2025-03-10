@@ -41,20 +41,12 @@ class BaseService {
         return false;
     };
     validateUserData = (data) => {
-        if (data.username && (typeof data.username !== 'string' || data.username.trim().length < 3)) {
-            return 'Username phải là chuỗi có ít nhất 3 ký tự.';
-        }
-
         if (data.phone && !/^\d{10,11}$/.test(data.phone)) {
             return 'Số điện thoại phải có 10-11 chữ số.';
         }
 
         if (data.email && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(data.email)) {
             return 'Email không hợp lệ.';
-        }
-
-        if (data.address && typeof data.address !== 'string') {
-            return 'Địa chỉ phải là chuỗi.';
         }
 
         return false;

@@ -8,7 +8,20 @@ const userSchema = new Schema({
     role: { type: String },
     phone: { type: String, unique: true, default: '' }, // Không required
     email: { type: String, unique: true, default: '' }, // Không required
-    address: { type: String, default: '' }, // Địa chỉ
+    address: {
+        province: {
+            code: { type: String, default: '' }, // Mã tỉnh
+            name: { type: String, default: '' }, // Tên tỉnh
+        },
+        district: {
+            code: { type: String, default: '' }, // Mã huyện
+            name: { type: String, default: '' }, // Tên huyện
+        },
+        ward: {
+            code: { type: String, default: '' }, // Mã xã
+            name: { type: String, default: '' }, // Tên xã
+        },
+    }, // Địa chỉ
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
