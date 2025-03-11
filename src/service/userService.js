@@ -47,28 +47,39 @@ class UserService extends BaseService {
             try {
                 const err = this.validateCarData(data);
                 if (err) return resolve(this.errorResponse(400, err));
-                const imageUrls = files.map((file) => file.path);
-                const userIdexist = await userSchema.findById(userId);
-                if (!userIdexist) {
-                    return resolve(this.errorResponse(400, `không tồndd tại user id ${userId}`));
+
+                // Tìm người bán theo userId
+                const seller = await userSchema.findById(userId);
+                if (!seller) {
+                    return resolve(this.errorResponse(400, `Không tồn tại user id ${userId}`));
                 }
+                const carImages = files.carImages ? files.carImages.map((file) => file.path) : [];
+                const documentImages = files.documentImages ? files.documentImages.map((file) => file.path) : [];
+
                 const newPendingCar = new pendingCarSchema({
                     title: data.title,
+                    brand: data.brand,
+                    year: data.year,
+                    mileage: data.mileage,
+                    condition: data.condition,
                     price: data.price,
                     description: data.description,
-                    address: data.address,
+                    address: seller.address,
                     sellerName: username,
                     sellerId: userId,
-                    images: imageUrls, // Lưu danh sách URL ảnh từ Cloudinary
+                    images: carImages,
+                    documentImages: documentImages,
                     status: 'pending',
                 });
+
                 await newPendingCar.save();
-                return resolve(this.successResponse('đăng tin bán xe thành công!', newPendingCar));
+                return resolve(this.successResponse('Đăng tin bán xe thành công!', newPendingCar));
             } catch (error) {
                 reject(error);
             }
         });
     };
+
     getApprovaledCar = () => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -244,8 +255,21 @@ class UserService extends BaseService {
         return new Promise(async (resolve, reject) => {
             try {
                 const updateData = {};
-                if (data.phone) updateData.phone = data.phone;
-                if (data.email) updateData.email = data.email;
+                if (data.email) {
+                    const existingEmailUser = await userSchema.findOne({ email: data.email, _id: { $ne: userId } });
+                    if (existingEmailUser) {
+                        return resolve(this.errorResponse(400, 'Email đã tồn tại.'));
+                    }
+                    updateData.email = data.email;
+                }
+
+                if (data.phone) {
+                    const existingPhoneUser = await userSchema.findOne({ phone: data.phone, _id: { $ne: userId } });
+                    if (existingPhoneUser) {
+                        return resolve(this.errorResponse(400, 'Số điện thoại đã tồn tại.'));
+                    }
+                    updateData.phone = data.phone;
+                }
                 if (data.address) {
                     updateData.address = {};
 

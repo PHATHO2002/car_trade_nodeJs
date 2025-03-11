@@ -22,7 +22,10 @@ const storage = new CloudinaryStorage({
 
 // Middleware kiểm tra số lượng ảnh trước khi upload
 const uploadCloud = (req, res, next) => {
-    const upload = multer({ storage }).array('images', 10); // Giới hạn 10 ảnh
+    const upload = multer({ storage }).fields([
+        { name: 'carImages', maxCount: 5 }, // 5 ảnh xe
+        { name: 'documentImages', maxCount: 5 }, // 5 ảnh giấy tờ
+    ]);
 
     upload(req, res, (err) => {
         if (err instanceof multer.MulterError && err.code === 'LIMIT_UNEXPECTED_FILE') {

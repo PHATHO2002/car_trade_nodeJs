@@ -21,11 +21,31 @@ class BaseService {
         return false;
     };
     validateCarData = (data) => {
-        if (!data.title || typeof data.title !== 'string' || data.title.trim().length < 5) {
-            return 'Tiêu đề phải là chuỗi có ít nhất 5 ký tự.';
+        if (!data.title || typeof data.title !== 'string' || data.title.trim().length < 2) {
+            return 'Tên xe phải có ít nhất 2 ký tự.';
         }
 
-        const price = Number(data.price); // Chuyển đổi price sang number trước khi kiểm tra
+        if (!data.brand || typeof data.brand !== 'string' || data.brand.trim().length < 2) {
+            return 'Hãng xe phải có ít nhất 2 ký tự.';
+        }
+
+        const year = Number(data.year);
+        const currentYear = new Date().getFullYear();
+        if (isNaN(year) || year < 1886 || year > currentYear) {
+            // 1886 là năm sản xuất xe đầu tiên
+            return `Năm sản xuất phải từ 1886 đến ${currentYear}.`;
+        }
+
+        const mileage = Number(data.mileage);
+        if (isNaN(mileage) || mileage < 0) {
+            return 'Số km đã đi phải là số và không được âm.';
+        }
+
+        if (!data.condition || typeof data.condition !== 'string') {
+            return 'Tình trạng xe phải là một chuỗi.';
+        }
+
+        const price = Number(data.price);
         if (isNaN(price) || price <= 0) {
             return 'Giá bán phải là số và lớn hơn 0.';
         }
@@ -34,12 +54,9 @@ class BaseService {
             return 'Mô tả phải có ít nhất 10 ký tự.';
         }
 
-        if (!data.address || typeof data.address !== 'string' || data.address.trim().length === 0) {
-            return 'Địa chỉ không được để trống.';
-        }
-
-        return false;
+        return false; // Không có lỗi
     };
+
     validateUserData = (data) => {
         if (data.phone && !/^\d{10,11}$/.test(data.phone)) {
             return 'Số điện thoại phải có 10-11 chữ số.';
