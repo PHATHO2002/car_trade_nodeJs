@@ -7,7 +7,7 @@ router.post('/', authenToken, uploader, CarController.create);
 router.delete('/:id', authenToken, CarController.delete);
 
 router.get('/search/:slug', authenToken, CarController.search);
-router.get('/brands', CarController.getBrandsOfCar);
 router.get('/', authenToken, CarController.get);
 
+router.get('/brands', CarController.getBrandsOfCar);// not resfull api here
 module.exports = router;

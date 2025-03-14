@@ -10,10 +10,11 @@ class CarService extends BaseService {
         return new Promise(async (resolve, reject) => {
             try {
                 const rsp = await carBrandSchema.find();
-                if (rsp.length <= 0) {
-                    return resolve(this.successResponse('Đăng tin bán xe thành công!', rsp));
+                if (rsp.length == 0) {
+                    return resolve(this.errorResponse(400, 'no local brand here'));
                 }
-                return resolve(this.errorResponse(400, 'no local brand here'));
+                return resolve(this.successResponse('get brans succes!', rsp));
+             
             } catch (error) {
                 reject(error);
             }
