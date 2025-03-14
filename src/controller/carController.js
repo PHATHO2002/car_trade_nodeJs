@@ -5,25 +5,25 @@ require('dotenv').config();
 class CarController {
     getBrandsOfCar = async (req, res) => {
         try {
-            const response = await CarService.postTradeCar();
+            const response = await CarService.getBrands();
             res.status(response.status).json(response);
         } catch (error) {
             console.error(error); // Sử dụng console.error để in rõ ràng lỗi
             res.status(500).json({ message: 'server error' });
         }
     };
-    postTradeCar = async (req, res) => {
+    create = async (req, res) => {
         try {
-            const response = await CarService.postTradeCar(req.userId, req.files, req.username, req.body);
+            const response = await CarService.create(req.userId, req.files, req.username, req.body);
             res.status(response.status).json(response);
         } catch (error) {
             console.error(error); // Sử dụng console.error để in rõ ràng lỗi
             res.status(500).json({ message: 'server error' });
         }
     };
-    getApprovaledCar = async (req, res) => {
+    get = async (req, res) => {
         try {
-            const response = await CarService.getApprovaledCar();
+            const response = await CarService.get(req.query);
             res.status(response.status).json(response);
         } catch (error) {
             console.error(error); // Sử dụng console.error để in rõ ràng lỗi
@@ -34,6 +34,16 @@ class CarController {
         try {
             const { slug } = req.params;
             const response = await CarService.search(slug);
+            res.status(response.status).json(response);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    };
+    delete = async (req, res) => {
+        try {
+            const { id } = req.params;
+            const response = await CarService.delete(req.userId, id); //req.userId lấy trong middleware authentoken
             res.status(response.status).json(response);
         } catch (error) {
             console.error(error);

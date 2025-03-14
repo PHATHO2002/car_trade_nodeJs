@@ -3,8 +3,11 @@ const router = express.Router();
 const CarController = require('../controller/carController');
 const authenToken = require('../middleware/authentoken');
 const uploader = require('../middleware/uploader');
-router.post('/post', authenToken, uploader, CarController.postTradeCar);
-router.post('/get-selling-car', authenToken, CarController.getApprovaledCar);
-// router.get('/brands',CarController)
+router.post('/', authenToken, uploader, CarController.create);
+router.delete('/:id', authenToken, CarController.delete);
+
 router.get('/search/:slug', authenToken, CarController.search);
+router.get('/brands', CarController.getBrandsOfCar);
+router.get('/', authenToken, CarController.get);
+
 module.exports = router;

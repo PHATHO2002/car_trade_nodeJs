@@ -1,7 +1,7 @@
 const BaseService = require('./baseService');
 const pendingCarSchema = require('../models/pendingCar');
 const carBrandSchema = require('../models/brandCar');
-
+const userSchema = require('../models/user');
 class CarService extends BaseService {
     constructor() {
         super();
@@ -9,14 +9,28 @@ class CarService extends BaseService {
     getBrands = () => {
         return new Promise(async (resolve, reject) => {
             try {
-                const rsp = carBrandSchema.find();
-                return resolve(this.successResponse('Đăng tin bán xe thành công!', newPendingCar));
+                const rsp = await carBrandSchema.find();
+                if (rsp.length <= 0) {
+                    return resolve(this.successResponse('Đăng tin bán xe thành công!', rsp));
+                }
+                return resolve(this.errorResponse(400, 'no local brand here'));
             } catch (error) {
                 reject(error);
             }
         });
     };
-    postTradeCar = (userId, files, username, data) => {
+    get = (query) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const Cars = await pendingCarSchema.find(query);
+                if (Cars.length === 0) return resolve(this.errorResponse(400, `empty `));
+                return resolve(this.successResponse(`get } car success `, Cars));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    create = (userId, files, username, data) => {
         return new Promise(async (resolve, reject) => {
             try {
                 const err = this.validateCarData(data);
@@ -53,12 +67,23 @@ class CarService extends BaseService {
             }
         });
     };
-    getApprovaledCar = () => {
+
+    delete = (userId, id) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const approvaledCars = await pendingCarSchema.find({ status: 'accepted' });
-                if (approvaledCars.length === 0) return resolve(this.errorResponse(400, 'empty approvaledCars'));
-                return resolve(this.successResponse('get Approval car success ', approvaledCars));
+                if (this.validateId(id)) {
+                    console.log(id);
+                    return resolve(this.errorResponse(400, 'carId không hợp lệ'));
+                }
+                const deletedPost = await pendingCarSchema.findOneAndDelete({
+                    sellerId: userId,
+                    _id: id,
+                });
+                if (deletedPost) {
+                    return resolve(this.successResponse('Xóa car thành công', deletedPost));
+                } else {
+                    return resolve(this.errorResponse(404, 'Không tìm thấy car'));
+                }
             } catch (error) {
                 reject(error);
             }
