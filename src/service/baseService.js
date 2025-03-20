@@ -1,3 +1,4 @@
+const axios = require('axios');
 class BaseService {
     successResponse(message, data = null, status = 200) {
         return {
@@ -14,6 +15,39 @@ class BaseService {
             data,
         };
     }
+    sendEmail = (senderEmail, senderName, recipientEmail, recipientName, subject, htmlContent) => {
+        return new Promise((resolve, reject) => {
+            axios
+                .post(
+                    process.env.API_SEND_EMAIL, // API URL từ biến môi trường
+                    {
+                        sender: {
+                            email: senderEmail,
+                            name: senderName,
+                        },
+                        to: [
+                            {
+                                email: recipientEmail,
+                                name: recipientName,
+                            },
+                        ],
+                        subject: subject,
+                        htmlContent: htmlContent, // Nội dung email truyền vào
+                    },
+                    {
+                        headers: {
+                            'api-key': process.env.BREVO_API_KEY, // API Key từ biến môi trường
+                        },
+                    },
+                )
+                .then((response) => {
+                    resolve(response.data);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    };
     validateId = (id) => {
         if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
             return 'id không hợp lệ.';
