@@ -49,6 +49,28 @@ class SiteController {
             res.status(500).json({ message: 'server error' });
         }
     };
+    loginGoogle = async (req, res) => {
+        try {
+            const response = await SiteService.loginGoogle(req.body);
+            console.log(req.body);
+            if (response.data) {
+                const oneMonth = 30 * 24 * 60 * 60 * 1000;
+                res.cookie('refreshToken', response.data.refreshToken, {
+                    httpOnly: true, // Ngăn JavaScript truy cập cookie → Chống XSS
+                    secure: true, // Chỉ gửi cookie qua HTTPS → Bảo mật hơn
+                    sameSite: 'Strict', // Chặn gửi cookie từ trang khác → Chống CSRF
+                    expires: new Date(Date.now() + oneMonth),
+                });
+                let { accessToken, refreshToken } = response.data;
+                response.data = { accessToken };
+            }
+
+            res.status(response.status).json(response);
+        } catch (error) {
+            console.error(error); // Sử dụng console.error để in rõ ràng lỗi
+            res.status(500).json({ message: 'server error' });
+        }
+    };
     logout = async (req, res) => {
         try {
             const response = await SiteService.logout(req.cookies.refreshToken);

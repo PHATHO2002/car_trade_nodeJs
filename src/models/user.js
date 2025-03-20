@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 const bcrypt = require('bcryptjs');
 const userSchema = new Schema({
     username: { type: String, required: true, unique: true },
-    password: { type: String, required: true, default: '' },
+    password: { type: String }, // ko yêu cầu require vì user login by gg
+    sub_gg: { type: String }, //sub gg để xác minh user đăng nhập bằng gg
     role: { type: String },
     phone: { type: String, unique: true, default: '' }, // Không required
     email: { type: String, unique: true, default: '' }, // Không required

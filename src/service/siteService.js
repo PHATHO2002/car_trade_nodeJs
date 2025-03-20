@@ -1,5 +1,6 @@
 const BaseService = require('./baseService');
 const userSchema = require('../models/user');
+const cartSchema = require('../models/Cart');
 const jwt = require('jsonwebtoken');
 const refreshTokenSchema = require('../models/refreshToken');
 class SiteService extends BaseService {
@@ -35,6 +36,52 @@ class SiteService extends BaseService {
                 let payLoad = {
                     role: role,
                     username: username,
+                    userId: user._id,
+                };
+
+                const accessToken = jwt.sign(payLoad, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5m' });
+                const refreshToken = jwt.sign(payLoad, process.env.REFRESH_TOKEN_SECRET);
+                const userId = user._id;
+                await refreshTokenSchema.findOneAndUpdate(
+                    { userId: userId }, // Tìm user đã có refreshToken
+                    { refreshToken: refreshToken }, // Cập nhật token mới
+                    { upsert: true, new: true }, // Nếu chưa có thì tạo mới
+                );
+
+                return resolve(this.successResponse('login successFully ', { accessToken, refreshToken }));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    loginGoogle = (data) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const { credential } = data || {};
+                if (!credential || typeof credential !== 'string' || credential.trim() === '') {
+                    return resolve(this.errorResponse(400, 'credential of gg rsp không được để trống'));
+                }
+                const decoded = jwt.decode(credential); //credential is token gg return
+                let user = await userSchema.findOne({ sub_gg: decoded.sub });
+
+                if (!user) {
+                    user = new userSchema({
+                        username: decoded.name,
+                        email: decoded.email,
+                        sub_gg: decoded.sub,
+                        role: 'user',
+                    });
+                    await user.save();
+                    const userId = user._id;
+                    const newCart = new cartSchema({ userId, carIds: [] });
+                    await newCart.save();
+                }
+
+                const { role } = user;
+
+                let payLoad = {
+                    role: role,
+                    username: decoded.name,
                     userId: user._id,
                 };
 
