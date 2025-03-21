@@ -6,7 +6,6 @@ const router = require('./src/route/index.js');
 const cors = require('cors');
 const Db = require('./src/config/dbConfig.js');
 const { setupSocket } = require('./src/config/socket.js');
-const test = require('./src/config/emailConfig.js');
 const path = require('path');
 require('dotenv').config();
 
