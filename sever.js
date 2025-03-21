@@ -26,7 +26,7 @@ require('dotenv').config();
     } else {
         app.use(
             cors({
-                origin: 'https://8cd7-118-70-184-26.ngrok-free.app',
+                origin: 'http://localhost:3000',
                 credentials: true, // Cho phép gửi cookie qua request
             }),
         );

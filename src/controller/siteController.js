@@ -35,8 +35,8 @@ class SiteController {
                 const oneMonth = 30 * 24 * 60 * 60 * 1000;
                 res.cookie('refreshToken', response.data.refreshToken, {
                     httpOnly: true, // Ngăn JavaScript truy cập cookie → Chống XSS
-                    secure: true, // Chỉ gửi cookie qua HTTPS → Bảo mật hơn
-                    sameSite: 'none',
+                    secure: process.env.NODE_ENV === 'production', // Chỉ gửi cookie qua HTTPS → Bảo mật hơn
+                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'Strict',
                     expires: new Date(Date.now() + oneMonth),
                 });
                 let { accessToken, refreshToken } = response.data;
@@ -57,8 +57,8 @@ class SiteController {
                 const oneMonth = 30 * 24 * 60 * 60 * 1000;
                 res.cookie('refreshToken', response.data.refreshToken, {
                     httpOnly: true, // Ngăn JavaScript truy cập cookie → Chống XSS
-                    secure: true,
-                    sameSite: 'none', //
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'Strict', //
                     expires: new Date(Date.now() + oneMonth),
                 });
                 let { accessToken, refreshToken } = response.data;
@@ -77,7 +77,7 @@ class SiteController {
             res.clearCookie('refreshToken', {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'none',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'Strict',
             });
             res.status(response.status).json(response);
         } catch (error) {
