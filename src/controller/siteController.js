@@ -35,7 +35,7 @@ class SiteController {
                 const oneMonth = 30 * 24 * 60 * 60 * 1000;
                 res.cookie('refreshToken', response.data.refreshToken, {
                     httpOnly: true, // Ngăn JavaScript truy cập cookie → Chống XSS
-                    secure: true, // Chỉ gửi cookie qua HTTPS → Bảo mật hơn
+                    secure: false, // Chỉ gửi cookie qua HTTPS → Bảo mật hơn
                     sameSite: 'Strict', // Chặn gửi cookie từ trang khác → Chống CSRF
                     expires: new Date(Date.now() + oneMonth),
                 });
