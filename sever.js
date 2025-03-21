@@ -18,7 +18,7 @@ require('dotenv').config();
     app.set('views', path.join('./src', 'views'));
     app.use(
         cors({
-            origin: 'https://8cd7-118-70-184-26.ngrok-free.app/', // Chỉ cho phép frontend này gọi API
+            origin: 'https://8cd7-118-70-184-26.ngrok-free.app', // Chỉ cho phép frontend này gọi API
             credentials: true, // Cho phép gửi cookie qua request
         }),
     );
