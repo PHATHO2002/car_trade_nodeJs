@@ -19,7 +19,7 @@ require('dotenv').config();
     if (process.env.NODE_ENV == 'production') {
         app.use(
             cors({
-                origin: 'https://www.muabanotocu.click/',
+                origin: 'https://www.muabanotocu.click',
                 credentials: true, // Cho phép gửi cookie qua request
             }),
         );
