@@ -19,14 +19,14 @@ require('dotenv').config();
     if (process.env.NODE_ENV == 'production') {
         app.use(
             cors({
-                origin: 'https://8cd7-118-70-184-26.ngrok-free.app',
+                origin: 'https://www.muabanotocu.click/',
                 credentials: true, // Cho phép gửi cookie qua request
             }),
         );
     } else {
         app.use(
             cors({
-                origin: 'https://www.muabanotocu.click/',
+                origin: 'https://8cd7-118-70-184-26.ngrok-free.app',
                 credentials: true, // Cho phép gửi cookie qua request
             }),
         );
