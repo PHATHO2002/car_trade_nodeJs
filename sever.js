@@ -18,7 +18,7 @@ require('dotenv').config();
     app.set('views', path.join('./src', 'views'));
     app.use(
         cors({
-            origin: 'http://localhost:3000', // Chỉ cho phép frontend này gọi API
+            origin: '*', // Chỉ cho phép frontend này gọi API
             credentials: true, // Cho phép gửi cookie qua request
         }),
     );
