@@ -16,12 +16,21 @@ require('dotenv').config();
     app.use('/', express.static(path.join('./src', 'public')));
     app.set('view engine', 'ejs');
     app.set('views', path.join('./src', 'views'));
-    app.use(
-        cors({
-            origin: 'https://8cd7-118-70-184-26.ngrok-free.app', // Chỉ cho phép frontend này gọi API
-            credentials: true, // Cho phép gửi cookie qua request
-        }),
-    );
+    if (process.env.NODE_ENV == 'production') {
+        app.use(
+            cors({
+                origin: 'https://8cd7-118-70-184-26.ngrok-free.app',
+                credentials: true, // Cho phép gửi cookie qua request
+            }),
+        );
+    } else {
+        app.use(
+            cors({
+                origin: 'https://www.muabanotocu.click/',
+                credentials: true, // Cho phép gửi cookie qua request
+            }),
+        );
+    }
 
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
