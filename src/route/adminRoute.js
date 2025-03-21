@@ -6,6 +6,6 @@ const authenAdmin = require('../middleware/authenAdmin');
 const AdminController = require('../controller/adminController');
 
 // route admin user
-router.get('/get-PendingCars', authenAdmin, AdminController.getPendingCars);
-router.post('/decision-pendingCars', authenAdmin, AdminController.decisionPendingCar);
+router.get('/car/pending', authenAdmin, AdminController.getPendingCars);
+router.post('/car/decision', authenAdmin, AdminController.decisionPendingCar);
 module.exports = router;

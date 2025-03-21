@@ -52,7 +52,7 @@ class SiteController {
     loginGoogle = async (req, res) => {
         try {
             const response = await SiteService.loginGoogle(req.body);
-            console.log(req.body);
+
             if (response.data) {
                 const oneMonth = 30 * 24 * 60 * 60 * 1000;
                 res.cookie('refreshToken', response.data.refreshToken, {

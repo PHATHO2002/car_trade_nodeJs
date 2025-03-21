@@ -24,7 +24,7 @@ class CarService extends BaseService {
     get = (query) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const Cars = await pendingCarSchema.find(query);
+                const Cars = await pendingCarSchema.find({ ...query, status: 'accepted' });
                 if (Cars.length === 0) return resolve(this.errorResponse(400, `empty `));
                 return resolve(this.successResponse(`get } car success `, Cars));
             } catch (error) {
