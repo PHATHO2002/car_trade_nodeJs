@@ -137,5 +137,33 @@ class CarService extends BaseService {
             }
         });
     };
+    // just update saleStatus of car
+    update_saleStatus = (userId, id, data) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if (this.validateId(id)) {
+                    return resolve(this.errorResponse(400, 'carId không hợp lệ'));
+                }
+                if (!data.saleStatus) {
+                    const requiredValues = ['available', 'reserved', 'sold'];
+                    if (!requiredValues.includes(data.saleStatus)) {
+                        return resolve(this.errorResponse(400, 'saleStatus không hợp lệ'));
+                    }
+                }
+                const response = await pendingCarSchema.findOneAndUpdate(
+                    { sellerId: userId, _id: id },
+                    { saleStatus: data.saleStatus },
+                    { new: true },
+                );
+                if (response) {
+                    return resolve(this.successResponse('update saleStatus success', response));
+                } else {
+                    return resolve(this.errorResponse(404, 'Không tìm thấy car'));
+                }
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
 }
 module.exports = new CarService();

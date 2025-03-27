@@ -40,6 +40,17 @@ class CarController {
             res.status(500).json({ error: error.message });
         }
     };
+    //just update saleStatus
+    update_saleStatus = async (req, res) => {
+        try {
+            const { id } = req.params;
+            const response = await CarService.update_saleStatus(req.userId, id, req.body);
+            res.status(response.status).json(response);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    };
     delete = async (req, res) => {
         try {
             const { id } = req.params;

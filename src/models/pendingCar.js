@@ -26,7 +26,11 @@ const pendingCarSchema = new mongoose.Schema({
     sellerId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
     images: { type: [String], required: true }, // Hình ảnh xe
     documentImages: { type: [String], required: true }, // Hình ảnh giấy tờ xe
-    status: { type: String, enum: ['pending', 'rejected', 'deposited', 'sold'], default: 'pending' }, // Trạng thái duyệt
+    status: { type: String, default: 'pending' }, // Trạng thái duyệt
+    saleStatus: {
+        type: String,
+        default: 'available',
+    }, // Trạng thái bán
     createdAt: { type: Date, default: Date.now },
 });
 
