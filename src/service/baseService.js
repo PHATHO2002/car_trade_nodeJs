@@ -1,4 +1,5 @@
 const axios = require('axios');
+const connectOrReturnRedis = require('../config/redis');
 class BaseService {
     successResponse(message, data = null, status = 200) {
         return {
@@ -48,12 +49,57 @@ class BaseService {
                 });
         });
     };
+    // handle redis
+    storeInRedis = async (key, value, ttl = null) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const redis = await connectOrReturnRedis();
+
+                if (ttl === null) {
+                    await redis.set(key, value); // Lưu key mà không có thời gian sống
+
+                    resolve('Lưu thành công ');
+                } else {
+                    await redis.set(key, value);
+                    await redis.expire(key, ttl); // Set TTL cho key
+                    resolve('Lưu thành công ');
+                }
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    checkInRedis = async (key, valueCheck, nameofValue) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const redis = await connectOrReturnRedis();
+                const value = await redis.get(key);
+                if (!value) {
+                    return reject(`Không tìm thấy  ${nameofValue} trong Redis.`);
+                }
+                if (value !== valueCheck) {
+                    return reject(`Giá trị ${nameofValue} không chính xác.`);
+                }
+                const ttl = await redis.ttl(key); // Lấy TTL của key
+
+                if (ttl <= 0) {
+                    return reject(` ${nameofValue} đã hết hạn `);
+                }
+                resolve(value);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+
+    // validate
     validateId = (id) => {
         if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
             return 'id không hợp lệ.';
         }
         return false;
     };
+
     validateCarData = (data) => {
         if (!data.title || typeof data.title !== 'string' || data.title.trim().length < 2) {
             return 'Tên xe phải có ít nhất 2 ký tự.';
@@ -95,9 +141,19 @@ class BaseService {
         if (data.phone && !/^\d{10,11}$/.test(data.phone)) {
             return 'Số điện thoại phải có 10-11 chữ số.';
         }
-
-        if (data.email && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(data.email)) {
-            return 'Email không hợp lệ.';
+        if (
+            data.email &&
+            (data.email.indexOf('@') === -1 ||
+                data.email.indexOf('.') === -1 ||
+                data.email.indexOf('@') > data.email.indexOf('.'))
+        ) {
+            return 'Email không hợp lệ...';
+        }
+        if (data.username && /\s/.test(data.username)) {
+            return 'Tên đăng nhập không được có khoảng trắng.';
+        }
+        if (data.password && data.password.trim().length < 6) {
+            return 'Mật khẩu phải có ít nhất 6 ký tự.';
         }
 
         return false;

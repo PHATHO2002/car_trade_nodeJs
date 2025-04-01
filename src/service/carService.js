@@ -26,12 +26,13 @@ class CarService extends BaseService {
             try {
                 const Cars = await pendingCarSchema.find({ ...query, status: 'accepted' });
                 if (Cars.length === 0) return resolve(this.errorResponse(400, `empty `));
-                return resolve(this.successResponse(`get } car success `, Cars));
+                return resolve(this.successResponse(`get  car success `, Cars));
             } catch (error) {
                 reject(error);
             }
         });
     };
+
     create = (userId, files, username, data) => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -44,13 +45,15 @@ class CarService extends BaseService {
                     return resolve(this.errorResponse(400, `Không tồn tại user id ${userId}`));
                 }
                 if (!seller.email) {
-                    return resolve(this.errorResponse(400, `you have not update email yet`));
+                    return resolve(this.errorResponse(400, `bạn chưa cập nhật email vui lòng  và profile cập nhật`));
                 }
                 if (!seller.address.province.code) {
-                    return resolve(this.errorResponse(400, `you have not update address yet`));
+                    return resolve(this.errorResponse(400, `bạn chưa cập nhật địa chỉ vui lòng  và profile cập nhật`));
                 }
                 if (!seller.phone) {
-                    return resolve(this.errorResponse(400, `you have not update phone yet`));
+                    return resolve(
+                        this.errorResponse(400, `bạn chưa cập nhật số điện thoại vui lòng  và profile cập nhật`),
+                    );
                 }
                 const carImages = files.carImages ? files.carImages.map((file) => file.path) : [];
                 const documentImages = files.documentImages ? files.documentImages.map((file) => file.path) : [];

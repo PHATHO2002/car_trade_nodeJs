@@ -6,6 +6,7 @@ const uploader = require('../middleware/uploader');
 router.post('/', authenToken, uploader, CarController.create);
 router.delete('/:id', authenToken, CarController.delete);
 router.patch('/update-sale-status/:id', authenToken, uploader, CarController.update_saleStatus);
+
 router.get('/search/:slug', authenToken, CarController.search);
 router.get('/', CarController.get);
 

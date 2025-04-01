@@ -21,6 +21,15 @@ class AdminController {
             res.status(500).json({ error: error.message });
         }
     };
+    getCarForAmin = async (req, res) => {
+        try {
+            const response = await adminService.getCarForAmin(req.query);
+            res.status(response.status).json(response);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    };
     getBrandCountByMonth = async (req, res) => {
         try {
             const { month, year } = req.query;

@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const router = require('./src/route/index.js');
 const cors = require('cors');
 const Db = require('./src/config/dbConfig.js');
+const connectOrReturnRedis = require('./src/config/redis.js');
 const { setupSocket } = require('./src/config/socket.js');
 const path = require('path');
 require('dotenv').config();
@@ -35,7 +36,8 @@ require('dotenv').config();
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
-    Db.connect(app);
+    await Db.connect(app);
+    await connectOrReturnRedis();
     router(app);
 
     const port = process.env.PORT || 4000;

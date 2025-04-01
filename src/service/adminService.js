@@ -32,6 +32,17 @@ class AdminService extends BaseService {
             }
         });
     };
+    getCarForAmin = (query) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const Cars = await pendingCarSchema.find({ ...query });
+                if (Cars.length === 0) return resolve(this.errorResponse(400, `empty `));
+                return resolve(this.successResponse(`get  car success `, Cars));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
     getBrandCountByMonth = (month = null, year = null) => {
         return new Promise(async (resolve, reject) => {
             try {

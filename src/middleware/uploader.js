@@ -32,7 +32,7 @@ const uploadCloud = (req, res, next) => {
             return res.status(400).json({ message: 'Chỉ được upload tối đa 10 ảnh!' });
         }
         if (err) {
-            return res.status(500).json({ message: 'Lỗi upload ảnh', error: err.message });
+            return res.status(500).json({ message: `Lỗi upload ảnh: ${err.message}`, error: err.message });
         }
         next();
     });
