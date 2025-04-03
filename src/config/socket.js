@@ -1,7 +1,7 @@
 const { Server } = require('socket.io');
 const socketAuth = require('../middleware/socketAuth');
 const postPendingCarSocket = require('../sockets/handlerPostSocket');
-const sendMessToSocket = require('../sockets/handleSendMess');
+const { sendMessToSocket, handleTyping } = require('../sockets/handleSendMess');
 
 // Sử dụng Object để lưu trạng thái người dùng online
 const usersOnline = {};
@@ -35,6 +35,7 @@ const setupSocket = (server) => {
             // Gọi các hàm xử lý socket khác
             postPendingCarSocket(io, socket);
             sendMessToSocket(io, socket, usersOnline);
+            handleTyping(socket, usersOnline);
 
             socket.on('disconnect', () => {
                 try {

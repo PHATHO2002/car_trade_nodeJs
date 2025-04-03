@@ -5,16 +5,17 @@ const sendMessToSocket = (io, socket, usersOnline) => {
         // Kiểm tra xem người nhận có online hay không
         const receiver = usersOnline[receiverId];
 
-        if (receiver) {
-            // Nếu người nhận online, gửi tin nhắn đến socketId của người nhận
-            io.to(receiver).emit('receive_message', data); // Gửi tin nhắn đến client cụ thể
-        } else {
-            // Nếu người nhận không online, gửi lỗi về client
-            socket.emit('send_message_error', {
-                error: `User with ID ${receiverId} is not online.`, // Lỗi gửi tin nhắn
-            });
+        // Nếu người nhận online, gửi tin nhắn đến socketId của người nhận
+        io.to(receiver).emit('receive_message', data); // Gửi tin nhắn đến client cụ thể
+    });
+};
+const handleTyping = (socket, usersOnline) => {
+    socket.on('typing', ({ senderId, receiverId }) => {
+        const receiverSocketId = usersOnline[receiverId];
+
+        if (receiverSocketId) {
+            socket.to(receiverSocketId).emit('typing', { senderId });
         }
     });
 };
-
-module.exports = sendMessToSocket;
+module.exports = { sendMessToSocket, handleTyping };
