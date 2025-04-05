@@ -8,5 +8,5 @@ router.post('/register/send-otp', UserController.sendOtpForRegistration);
 router.get('/', authenToken, UserController.get);
 router.patch('/', authenToken, UserController.update);
 router.patch('/change-pass', authenToken, UserController.updatePassword);
-//tetssss
+//tetssssss
 module.exports = router;
