@@ -1,4 +1,4 @@
-import { createClient } from 'redis';
+const { createClient } = require('redis');
 
 let clientRedis = null; // Lưu trữ instance của Redis client
 
